@@ -1,0 +1,32 @@
+name: Compile FTS15 Mod
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Android NDK & CMake
+        uses: nttld/setup-ndk@v3
+        with:
+          ndk-version: r25b
+          add-to-path: true
+
+      - name: Make build script executable
+        run: chmod +x fts15_mod/build.sh
+
+      - name: Run Build Script
+        run: |
+          cd fts15_mod
+          ./build.sh
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: fts15-mod-output
+          path: |
+            fts15_mod/**/*.so
+            fts15_mod/build/**
