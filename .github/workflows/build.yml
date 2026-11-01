@@ -26,34 +26,30 @@ jobs:
           unzip -q dobby_master.zip
           cp -r Dobby-master/include/* dobby/include/
           
-          # Como la lib estática requiere compilación o descarga directa, 
-          # descargamos un release precompilado compatible para Android armeabi-v7a
+          # Descargamos el release precompilado de Dobby
           curl -L -o dobby_android.zip https://github.com/jmpews/Dobby/releases/download/2.3/Dobby-Android.zip || true
           if [ -f dobby_android.zip ]; then
-            unzip -q dobby_android.zip -s || true
+            unzip -q dobby_android.zip || true
           fi
           
-          # Limpieza de archivos temporales
+          # Limpieza de temporales
           rm -rf dobby_master.zip Dobby-master dobby_android.zip
 
-      - name: Configurar Android NDK y CMake
-        uses: reactivecircus/android-emulator-runner@v2 # O usa el entorno nativo de GitHub con NDK preinstalado
-        with:
-          api-level: 21
-          target: default
-          arch: armeabi-v7a
-          coroutine: false
-
-      - name: Compilar con CMake y NDK
+      - name: Compilar con CMake y NDK (Línea de comandos pura)
         run: |
           cd fts15_mod
           mkdir -p build
+          
+          # El SDK y NDK de Android ya vienen preinstalados en los runners de GitHub (`$ANDROID_SDK_ROOT`)
+          export NDK_PATH=$ANDROID_SDK_ROOT/ndk/current
+          
           cmake -S . -B build \
-            -DCMAKE_TOOLCHAIN_FILE="$ANDROID_HOME/ndk-bundle/build/cmake/android.toolchain.cmake" \
+            -DCMAKE_TOOLCHAIN_FILE="$NDK_PATH/build/cmake/android.toolchain.cmake" \
             -DANDROID_ABI=armeabi-v7a \
             -DANDROID_PLATFORM=android-21 \
             -DANDROID_STL=c++_static \
             -DCMAKE_BUILD_TYPE=Release
+            
           cmake --build build
 
       - name: Subir Artifact (.so compilado)
