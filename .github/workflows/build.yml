@@ -31,27 +31,19 @@ jobs:
           project(ftsmod CXX)
           set(CMAKE_CXX_STANDARD 17)
 
+          # Agregar la ruta base global para que Dobby encuentre sus propios headers internos (core/arch/Cpu.h)
+          include_directories(
+              dobby_src/source
+              dobby/include
+          )
+
           # Integrar Dobby directamente
           add_subdirectory(dobby_src)
-
-          # Inyectar rutas internas directamente al target de Dobby para que halle Cpu.h
-          target_include_directories(dobby PRIVATE 
-              dobby_src/source
-              dobby_src/source/core
-              dobby_src/source/core/arch
-          )
 
           # Compilar el mod principal
           add_library(ftsmod SHARED mod.cpp)
 
-          # Incluir directorios para nuestro mod
-          target_include_directories(ftsmod PRIVATE 
-              .
-              dobby/include
-              dobby_src/include
-              dobby_src/source
-          )
-
+          # Vincular librerías
           target_link_libraries(ftsmod dobby log dl)
           EOF
 
