@@ -1,4 +1,4 @@
-Name: Compile FTS15 Mod
+name: Compile FTS15 Mod
 
 on: [push, pull_request]
 
