@@ -16,15 +16,14 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Descargar Dobby (Código Fuente y Estructura)
+      - name: Descargar Dobby (Código Fuente)
         run: |
           cd fts15_mod
-          # Clonamos la versión exacta de Dobby que sabemos que funciona
           git clone --depth=1 https://github.com/jmpews/Dobby.git dobby_src
           mkdir -p dobby/include
           cp -r dobby_src/include/* dobby/include/
 
-      - name: Configurar CMakeLists.txt con Dobby
+      - name: Asegurar CMakeLists.txt con Dobby
         run: |
           cd fts15_mod
           cat << 'EOF' > CMakeLists.txt
@@ -38,17 +37,20 @@ jobs:
           # Compilar el mod principal
           add_library(ftsmod SHARED mod.cpp)
 
+          # Incluir todas las rutas de cabeceras públicas e internas de Dobby
           target_include_directories(ftsmod PRIVATE 
               .
               dobby/include
               dobby_src/include
               dobby_src/source
+              dobby_src/source/core
+              dobby_src/source/core/arch
           )
 
           target_link_libraries(ftsmod dobby log dl)
           EOF
 
-      - name: Compilar con CMake y NDK (Detección automática)
+      - name: Compilar con CMake y NDK
         run: |
           cd fts15_mod
           mkdir -p build
