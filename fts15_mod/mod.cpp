@@ -116,8 +116,9 @@ static void install(void* lib, const char* sym, void* repl, void** orig) {
   g_hooksTotal++;
   void* addr = dlsym(lib, sym);
   if (!addr) { LOGE("simbolo no encontrado: %s", sym); return; }
-  // Si tu versión de Dobby declara void* en vez de dobby_dummy_func_t, ajusta los casts.
-  if (DobbyHook(addr, (dobby_dummy_func_t)repl, (dobby_dummy_func_t*)orig) == 0) {
+  
+  // Usamos cast genérico a (void*) compatible con Dobby actualizado
+  if (DobbyHook(addr, (void*)repl, (void**)orig) == 0) {
     g_hooksOk++; LOGI("hook OK %s @%p", sym, addr);
   } else {
     LOGE("DobbyHook fallo: %s", sym);
