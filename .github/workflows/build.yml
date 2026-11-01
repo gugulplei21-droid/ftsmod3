@@ -26,14 +26,21 @@ jobs:
           unzip -q dobby_master.zip
           cp -r Dobby-master/include/* dobby/include/
           
-          # Descargamos el release precompilado de Dobby para Android
-          curl -L -o dobby_android.zip https://github.com/jmpews/Dobby/releases/download/2.3/Dobby-Android.zip || true
-          if [ -f dobby_android.zip ]; then
-            unzip -q dobby_android.zip || true
+          # Descargamos el release precompilado oficial de Dobby y extraemos la lib de armeabi-v7a
+          curl -L -o dobby_android.zip https://github.com/jmpews/Dobby/releases/download/2.3/Dobby-Android.zip
+          unzip -q dobby_android.zip -d dobby_temp || true
+          
+          # Buscamos y copiamos libdobby.a a su carpeta correspondiente para que CMake lo encuentre
+          find dobby_temp -name "libdobby.a" -path "*/armeabi-v7a/*" -exec cp {} dobby/lib/armeabi-v7a/ \; || true
+          
+          # Respaldo por si la estructura cambia en el zip
+          if [ ! -f "dobby/lib/armeabi-v7a/libdobby.a" ]; then
+            echo "Buscando libdobby.a en cualquier ruta..."
+            find dobby_temp -name "libdobby.a" -exec cp {} dobby/lib/armeabi-v7a/ \; || true
           fi
           
           # Limpieza de archivos temporales
-          rm -rf dobby_master.zip Dobby-master dobby_android.zip
+          rm -rf dobby_master.zip Dobby-master dobby_android.zip dobby_temp
 
       - name: Compilar con CMake y NDK
         run: |
