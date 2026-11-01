@@ -34,17 +34,22 @@ jobs:
           # Integrar Dobby directamente
           add_subdirectory(dobby_src)
 
+          # Inyectar rutas internas directamente al target de Dobby para que halle Cpu.h
+          target_include_directories(dobby PRIVATE 
+              dobby_src/source
+              dobby_src/source/core
+              dobby_src/source/core/arch
+          )
+
           # Compilar el mod principal
           add_library(ftsmod SHARED mod.cpp)
 
-          # Incluir todas las rutas de cabeceras públicas e internas de Dobby
+          # Incluir directorios para nuestro mod
           target_include_directories(ftsmod PRIVATE 
               .
               dobby/include
               dobby_src/include
               dobby_src/source
-              dobby_src/source/core
-              dobby_src/source/core/arch
           )
 
           target_link_libraries(ftsmod dobby log dl)
