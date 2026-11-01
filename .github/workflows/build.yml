@@ -26,22 +26,23 @@ jobs:
           unzip -q dobby_master.zip
           cp -r Dobby-master/include/* dobby/include/
           
-          # Descargamos el release precompilado de Dobby
+          # Descargamos el release precompilado de Dobby para Android
           curl -L -o dobby_android.zip https://github.com/jmpews/Dobby/releases/download/2.3/Dobby-Android.zip || true
           if [ -f dobby_android.zip ]; then
             unzip -q dobby_android.zip || true
           fi
           
-          # Limpieza de temporales
+          # Limpieza de archivos temporales
           rm -rf dobby_master.zip Dobby-master dobby_android.zip
 
-      - name: Compilar con CMake y NDK (Línea de comandos pura)
+      - name: Compilar con CMake y NDK
         run: |
           cd fts15_mod
           mkdir -p build
           
-          # El SDK y NDK de Android ya vienen preinstalados en los runners de GitHub (`$ANDROID_SDK_ROOT`)
-          export NDK_PATH=$ANDROID_SDK_ROOT/ndk/current
+          # Detectar automáticamente la ruta del NDK instalada en el runner de GitHub
+          NDK_PATH=$(find $ANDROID_SDK_ROOT/ndk -maxdepth 1 -mindepth 1 | sort -V | tail -n 1)
+          echo "Usando NDK en: $NDK_PATH"
           
           cmake -S . -B build \
             -DCMAKE_TOOLCHAIN_FILE="$NDK_PATH/build/cmake/android.toolchain.cmake" \
