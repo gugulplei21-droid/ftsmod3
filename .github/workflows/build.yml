@@ -1,4 +1,4 @@
-name: Compile FTS15 Mod
+Name: Compile FTS15 Mod
 
 on: [push, pull_request]
 
@@ -10,7 +10,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup Android NDK & CMake
-        uses: nttld/setup-ndk@v3
+        uses: nttld/setup-ndk@v4
         with:
           ndk-version: r25b
           add-to-path: true
